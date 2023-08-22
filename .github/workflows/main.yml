@@ -3,7 +3,7 @@ on:
   push:
     branches:
     - master
-    - dev
+    - developers
     - staging
 
 jobs:
