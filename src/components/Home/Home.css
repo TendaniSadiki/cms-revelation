@@ -10,9 +10,11 @@
     float: left;
     width: 30%;
     height: 100vh;
+    background-color: #F7CAC9;
   }
   .centerCms{
    width: 40%;
+   text-align: center;
   }
 .rightbar{
     float: right;

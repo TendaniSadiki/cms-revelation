@@ -6,6 +6,8 @@ const Inventory = () => {
   const [products, setProducts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editedProduct, setEditedProduct] = useState(null);
+  const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"];
 
   useEffect(() => {
     // Fetch user's products from Firestore
@@ -57,6 +59,43 @@ const Inventory = () => {
       }
     }
   };
+  const handleProductImageUpload = async (event) => {
+    const imageFile = event.target.files[0];
+    if (imageFile) {
+      try {
+        const base64 = await convertFileToBase64(imageFile);
+        setEditedProduct({ ...editedProduct, productImage: base64 });
+      } catch (error) {
+        console.error("Error converting product image to base64:", error);
+      }
+    }
+  };
+  const handleSizeToggle = (size) => {
+    if (editedProduct) {
+      const updatedSizes = editedProduct.availableSizes.includes(size)
+        ? editedProduct.availableSizes.filter((s) => s !== size)
+        : [...editedProduct.availableSizes, size];
+      setEditedProduct({ ...editedProduct, availableSizes: updatedSizes });
+    }
+  };
+
+  const handleColorToggle = (color) => {
+    if (editedProduct) {
+      const updatedColors = editedProduct.availableColors.includes(color)
+        ? editedProduct.availableColors.filter((c) => c !== color)
+        : [...editedProduct.availableColors, color];
+      setEditedProduct({ ...editedProduct, availableColors: updatedColors });
+    }
+  };
+
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
   return (
     <div>
@@ -76,16 +115,82 @@ const Inventory = () => {
       {isEditing && editedProduct && (
         <div>
           <h3>Edit Product</h3>
+          <label>Available Sizes:</label>
+          {sizes.map((size) => (
+            <label key={size}>
+              <input
+                type="checkbox"
+                checked={editedProduct.availableSizes.includes(size)}
+                onChange={() => handleSizeToggle(size)}
+              />
+              {size}
+            </label>
+          ))}
+          
+          <label>Available Colors:</label>
+          {colors.map((color) => (
+            <label key={color}>
+              <input
+                type="checkbox"
+                checked={editedProduct.availableColors.includes(color)}
+                onChange={() => handleColorToggle(color)}
+              />
+              {color}
+            </label>
+          ))}
+          <label>Select Product Type:</label>
+          <select value={editedProduct.brand} onChange={(e) => setEditedProduct({ ...editedProduct, brand: e.target.value })}>
+            <option value="0">Select Type</option>
+            <option value="Tops">Tops</option>
+            <option value="Shirts">Shirts</option>
+            <option value="Jackets,Sweatshirts&Blazers">
+              Jackets, Sweatshirts & Blazers
+            </option>
+            <option value="Denim">Denim</option>
+            <option value="Pants">Pants</option>
+            <option value="Shorts">Shorts</option>
+            <option value="Shoes">Shoes</option>
+            <option value="Bags&Wallets">Bags & Wallets</option>
+            <option value="Belts">Belts</option>
+            <option value="Hats&Scarves">Hats & Scarves</option>
+          </select>
+          <label>Select Brand Category:</label>
+          <select value={editedProduct.category} 
+          onChange={(e) => setEditedProduct({ ...editedProduct, category: e.target.value })}>
+            <option value="0">Select Category</option>
+            <option value="Summer">Summer</option>
+            <option value="Winter">Winter</option>
+            <option value="Accessories">Accessories</option>
+          </select>
+          <label>Product image:</label>
+          <input type="file" accept="image/*" onChange={handleProductImageUpload} />
+          {editedProduct.productImage && (
+            <img src={editedProduct.productImage} alt="product" className="EditedImage" />
+          )}
+          <label>Product name</label>
           <input
             type="text"
             value={editedProduct.productName}
             onChange={(e) => setEditedProduct({ ...editedProduct, productName: e.target.value })}
           />
+          <label>Price</label>
           <input
             type="number"
             value={editedProduct.price}
             onChange={(e) => setEditedProduct({ ...editedProduct, price: e.target.value })}
           />
+           <label>Quantity</label>
+          <input
+            type="number"
+            value={editedProduct.quantity}
+            onChange={(e) => setEditedProduct({ ...editedProduct, quantity: e.target.value })}
+          />
+          <label>About the Product:</label>
+      <textarea
+        value={editedProduct.description}
+        onChange={(e) => setEditedProduct({ ...editedProduct, description: e.target.value })}
+      />
+      
           <button onClick={handleUpdateProduct}>Save</button>
           <button onClick={() => setIsEditing(false)}>Cancel</button>
         </div>
