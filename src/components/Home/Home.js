@@ -12,9 +12,9 @@ function Home() {
       setActiveBtn(index)
    }
   return (
-    <div>
+    <div className="Home">
       <h2>Welcome to the Home Page</h2>
-      <nav>
+      <nav className="sidebar">
         <ul>
           <li>
             <Link onClick={()=>toogle(0)}  className={activeBtn === 0 ? 'activebtn' : "activebtn2" } to="/inventory">Inventory</Link>
@@ -27,12 +27,12 @@ function Home() {
           </li>
         </ul>
       </nav>
-      <div>
+      <div className="centerCms" >
       {
                 ( activeBtn === 0 ? <Inventory /> : activeBtn === 1 ? <PendingOrders /> : <OrderHistory /> )
             }
       </div>
-      <div>
+      <div className="rightbar">
         <AddProductForm/>
       </div>
     </div>

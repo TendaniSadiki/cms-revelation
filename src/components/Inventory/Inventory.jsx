@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../../config/firebase";
 import { collection, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
-
+import './Inventory.css'
 const Inventory = () => {
   const [products, setProducts] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -64,6 +64,7 @@ const Inventory = () => {
       <ul>
         {products.map((product) => (
           <li key={product.id}>
+            <img src={product.productImage} alt="product" className="InventoryImage" />
             <p>Product Name: {product.productName}</p>
             <p>Price: {product.price}</p>
             <button onClick={() => handleDeleteProduct(product.id)}>Delete</button>
