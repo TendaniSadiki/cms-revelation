@@ -14,15 +14,21 @@ function App() {
     const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
       if (authUser) {
         setUser(authUser);
-
+  
         // Fetch user role from Firestore and check if it's admin
         const userDocRef = doc(collection(db, "admins"), authUser.uid);
-       
-        const userDocSnapshot = await getDoc(userDocRef);
-        console.log(userDocSnapshot.data().role)
-        if (userDocSnapshot.exists() && userDocSnapshot.data().role === "admin") {
-          setIsAdmin(true);
-        } else {
+  
+        try {
+          const userDocSnapshot = await getDoc(userDocRef);
+  
+          if (userDocSnapshot.exists() && userDocSnapshot.data().role === "admin") {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
+        } catch (error) {
+          console.error("Error fetching user role:", error);
+          // Handle error state here, e.g., set isAdmin to false or show an error message
           setIsAdmin(false);
         }
       } else {
@@ -30,9 +36,10 @@ function App() {
         setIsAdmin(false); // Reset admin status if not authenticated
       }
     });
-
+  
     return () => unsubscribe();
   }, []);
+  
 
   const handleLogout = async () => {
     try {
