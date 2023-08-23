@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { auth } from "./config/firebase";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { auth, db } from "./config/firebase";
 import Signup from "./components/SignUp/SignUp";
 import Home from "./components/Home/Home";
 import SignIn from "./components/SignIn/SignIn";
+import { collection, doc, getDoc } from "firebase/firestore";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false); // State to track admin role
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
       if (authUser) {
         setUser(authUser);
+
+        // Fetch user role from Firestore and check if it's admin
+        const userDocRef = doc(collection(db, "admins"), authUser.uid);
+       
+        const userDocSnapshot = await getDoc(userDocRef);
+        console.log(userDocSnapshot.data().role)
+        if (userDocSnapshot.exists() && userDocSnapshot.data().role === "admin") {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
       } else {
         setUser(null);
+        setIsAdmin(false); // Reset admin status if not authenticated
       }
     });
 
@@ -24,6 +38,7 @@ function App() {
     try {
       await auth.signOut();
       setUser(null);
+      setIsAdmin(false);
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -34,7 +49,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {isEmailVerified && (
+        {isEmailVerified && isAdmin && (
           <nav>
             <ul>
               <li>
@@ -45,22 +60,24 @@ function App() {
         )}
 
         <Routes>
-          {isEmailVerified && user ? (
+          {isEmailVerified && isAdmin ? (
             <>
-              <Route path="/home" element={<Home />} />
-              <Route path="/*" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/*" element={<Home />} />
             </>
           ) : (
             <>
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/*" element={<Signup />} />
+            <Route path="/signup" element={<Signup/>} />
+            <Route path="/signin" element={<SignIn/>} />
+            <Route path="/*" element={<Navigate to="/signup" />} />
             </>
           )}
-        </Routes>
 
+         
+        </Routes>
       </div>
     </Router>
   );
 }
+
 export default App;

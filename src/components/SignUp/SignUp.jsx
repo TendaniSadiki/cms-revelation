@@ -5,7 +5,7 @@ import {
 } from "firebase/auth";
 import { NavLink } from "react-router-dom";
 import { auth, db } from "../../config/firebase";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import {  collection, doc, setDoc } from "firebase/firestore";
 import "./SignUp.css";
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -35,36 +35,25 @@ const SignUp = () => {
       if (step === 0) {
         handleGetStarted();
       } else if (step === 1) {
+        // Create user account with email and password
         await createUserWithEmailAndPassword(auth, email, password);
-        setStep(2);
+  
         // Send email verification
-        sendEmailVerification(auth.currentUser).then(() => {
-          // Verification email sent
-        });
-      } else if (step === 2) {
-        // Save business info to the "admins" collection in Firestore
+        sendEmailVerification(auth.currentUser);
+  
+        setStep(4); // Skip steps 2 and 3
+      } else if (step === 4) {
         const businessData = {
           businessName,
           businessAddress,
+          role: "admin",
         };
-        const businessCollectionRef = collection(db, "admins");
-        await addDoc(businessCollectionRef, businessData);
-
-        setStep(3);
-        // Redirect or perform the next step as needed
-      } else if (step === 3) {
-        // Save tax information to the "admins" collection in Firestore
+  
         const taxData = {
           taxId: taxInfo.taxId,
           taxJurisdiction: taxInfo.taxJurisdiction,
         };
-        const taxCollectionRef = collection(db, "admins");
-        await addDoc(taxCollectionRef, { taxInfo: taxData }, { merge: true });
-
-        setStep(4);
-        // Redirect or perform the next step as needed
-      } else if (step === 4) {
-        // Save additional user information to the "admins" collection in Firestore
+  
         const userData = {
           fullName,
           phoneNumber,
@@ -73,36 +62,25 @@ const SignUp = () => {
           securityQuestion1,
           securityQuestion2,
           termsAgreed,
+          role:"admin",
+          taxInfo: taxData, // Save tax information
+          businessInfo: businessData, // Save business information
         };
+  
         const userCollectionRef = collection(db, "admins");
-
-        // Get the user's UID
-        const user = auth.currentUser;
-        const userUid = user.uid;
-
-        // Use the UID as the document ID
+        const userUid = auth.currentUser.uid;
         const userDocRef = doc(userCollectionRef, userUid);
         await setDoc(userDocRef, userData);
-
-        // Create a subcollection under the user's document
-        const subcollectionRef = collection(userDocRef, "store");
-
-        // Use the UID as the document ID for the subcollection
-        const subcollectionDocRef = doc(subcollectionRef, "products");
-
-        // Add data to the subcollection
-        await setDoc(subcollectionDocRef, {
-          field1: "value1",
-          field2: "value2",
-        });
-
+  
         setStep(5);
-        // Redirect or perform the next step as needed
       }
     } catch (error) {
       setError(error.message);
     }
   };
+  
+  
+
 
   return (
     <div className="signup-container">
@@ -128,8 +106,8 @@ const SignUp = () => {
               </button>
             </div>
             <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
+              Already have an account? <NavLink to="/signin">Sign In</NavLink>
+            </p>
           </div>
         </div>
       )}
@@ -234,10 +212,11 @@ const SignUp = () => {
             />
             <input
               type="text"
-              placeholder="Date of Birth"
+              placeholder="Date of Birth (YYYY-MM-DD)"
               value={dateOfBirth}
               onChange={(e) => setDateOfBirth(e.target.value)}
             />
+
             <input
               type="text"
               placeholder="Profile Picture URL"
