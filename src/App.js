@@ -5,6 +5,7 @@ import Signup from "./components/SignUp/SignUp";
 import Home from "./components/Home/Home";
 import SignIn from "./components/SignIn/SignIn";
 import { collection, doc, getDoc } from "firebase/firestore";
+import "./App.css"
 
 function App() {
   const [user, setUser] = useState(null);

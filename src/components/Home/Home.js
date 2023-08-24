@@ -27,10 +27,13 @@ function Home() {
           </li>
         </ul>
       </nav>
-      <div className="centerCms" >
-      {
-                ( activeBtn === 0 ? <Inventory /> : activeBtn === 1 ? <PendingOrders /> : <OrderHistory /> )
+      <div  >
+       
+        {
+                ( activeBtn === 0 ? <div><Inventory /></div> : activeBtn === 1 ? <PendingOrders /> : <OrderHistory /> )
             }
+       
+           
       </div>
       <div className="rightbar">
         <AddProductForm/>
