@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+<<<<<<< HEAD
 import AddProductForm from "./components/AddProduct/AddProduct";
+=======
+>>>>>>> 022a5cdb11cdcd84c848c022bec95327c42c145e
 import { auth } from "./config/firebase";
 import Signup from "./components/SignUp/SignUp";
 import Home from "./components/Home/Home";
@@ -60,7 +63,10 @@ function App() {
           )}
         </Routes>
 
+<<<<<<< HEAD
         {isEmailVerified && user && <AddProductForm />}
+=======
+>>>>>>> 022a5cdb11cdcd84c848c022bec95327c42c145e
       </div>
     </Router>
   );
