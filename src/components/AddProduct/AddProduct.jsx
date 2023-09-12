@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import './AddProductForm.css';
-import { auth, db} from '../../config/firebase';
-import { addDoc, collection } from 'firebase/firestore';
+import React, { useState } from "react";
+import "./AddProductForm.css";
+import { auth, db } from "../../config/firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 const AddProductForm = () => {
-  const [brand, setBrand] = useState('');
-  const [category, setCategory] = useState('');
-  const [productName, setProductName] = useState('');
-  const [price, setPrice] = useState('');
-  const [description, setDescription] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const [brand, setBrand] = useState("");
+  const [category, setCategory] = useState("");
+  const [productName, setProductName] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [productImage, setProductImage] = useState(null);
@@ -20,8 +20,8 @@ const AddProductForm = () => {
 
   const [formErrors, setFormErrors] = useState({});
 
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
-  const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow'];
+  const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+  const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"];
 
   const handleSizeChange = (size) => {
     // Toggle selected size
@@ -57,11 +57,11 @@ const AddProductForm = () => {
         const base64 = await convertFileToBase64(imageFile);
         setFrontImage({ file: imageFile, base64 });
       } catch (error) {
-        console.error('Error converting front image to base64:', error);
+        console.error("Error converting front image to base64:", error);
       }
     }
   };
-  
+
   const handleBackImageUpload = async (event) => {
     // Handle back image upload
     const imageFile = event.target.files[0];
@@ -70,7 +70,7 @@ const AddProductForm = () => {
         const base64 = await convertFileToBase64(imageFile);
         setBackImage({ file: imageFile, base64 });
       } catch (error) {
-        console.error('Error converting back image to base64:', error);
+        console.error("Error converting back image to base64:", error);
       }
     }
   };
@@ -102,15 +102,20 @@ const AddProductForm = () => {
       const user = auth.currentUser;
       if (user) {
         const userUid = user.uid;
-        const productsCollectionRef = collection(db, 'admins', userUid, 'products');
+        const productsCollectionRef = collection(
+          db,
+          "admins",
+          userUid,
+          "products"
+        );
         await addDoc(productsCollectionRef, productData);
 
         // Reset form fields and set submission status
-        setBrand('');
-        setCategory('');
-        setProductName('');
-        setPrice('');
-        setDescription('');
+        setBrand("");
+        setCategory("");
+        setProductName("");
+        setPrice("");
+        setDescription("");
         setSelectedSizes([]);
         setSelectedColors([]);
         setIsPrintable(false);
@@ -118,11 +123,11 @@ const AddProductForm = () => {
         setBackImage(null);
         setProductImage(null);
         setFormErrors({});
-        setSubmissionStatus('success');
+        setSubmissionStatus("success");
       }
     } catch (error) {
-      console.error('Error adding product:', error);
-      setSubmissionStatus('error');
+      console.error("Error adding product:", error);
+      setSubmissionStatus("error");
     }
   };
 
@@ -136,30 +141,29 @@ const AddProductForm = () => {
     });
   };
 
-
   return (
     <div className="form-container">
-         <div className="form-content"></div>
-       <label>Select Product Type:</label>
-        <select  value={brand}
-          onChange={(e) => setBrand(e.target.value)}>
-          <option value="0">Select Type</option>
-          <option value="Tops">Tops</option>
-          <option value="Shirts">Shirts</option>
-          <option value="Jackets,Sweatshirts&Blazers">Jackets, Sweatshirts & Blazers</option>
-          <option value="Denim">Denim</option>
-          <option value="Pants">Pants</option>
-          <option value="Shorts">Shorts</option>
-          <option value="Shoes">Shoes</option>
-          <option value="Bags&Wallets">Bags & Wallets</option>
-          <option value="Belts">Belts</option>
-          <option value="Hats&Scarves">Hats & Scarves</option>
-        </select>
+      <div className="form-content"></div>
+      <label>Select Product Type:</label>
+      <select value={brand} onChange={(e) => setBrand(e.target.value)}>
+        <option value="0">Select Type</option>
+        <option value="Tops">Tops</option>
+        <option value="Shirts">Shirts</option>
+        <option value="Jackets,Sweatshirts&Blazers">
+          Jackets, Sweatshirts & Blazers
+        </option>
+        <option value="Denim">Denim</option>
+        <option value="Pants">Pants</option>
+        <option value="Shorts">Shorts</option>
+        <option value="Shoes">Shoes</option>
+        <option value="Bags&Wallets">Bags & Wallets</option>
+        <option value="Belts">Belts</option>
+        <option value="Hats&Scarves">Hats & Scarves</option>
+      </select>
 
       <div>
         <label>Select Brand Category:</label>
-        <select  value={category}
-          onChange={(e) => setCategory(e.target.value)}>
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="0">Select Category</option>
           <option value="Summer">Summer</option>
           <option value="Winter">Winter</option>
@@ -168,18 +172,31 @@ const AddProductForm = () => {
       </div>
 
       <label>Product Name:</label>
-      <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} />
-      {formErrors.productName && <p className="error">{formErrors.productName}</p>}
+      <input
+        type="text"
+        value={productName}
+        onChange={(e) => setProductName(e.target.value)}
+      />
+      {formErrors.productName && (
+        <p className="error">{formErrors.productName}</p>
+      )}
 
       <label>Price:</label>
-      <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+      <input
+        type="number"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+      />
       {formErrors.price && <p className="error">{formErrors.price}</p>}
 
       <label>About the Product:</label>
-      <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
 
       <label>Available Sizes:</label>
-      {sizes.map(size => (
+      {sizes.map((size) => (
         <label key={size}>
           <input
             type="checkbox"
@@ -191,7 +208,7 @@ const AddProductForm = () => {
       ))}
 
       <label>Available Colors:</label>
-      {colors.map(color => (
+      {colors.map((color) => (
         <div key={color}>
           <label>
             <input
@@ -203,12 +220,18 @@ const AddProductForm = () => {
           </label>
         </div>
       ))}
-         <label>Quantity</label>
-      <input type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+      <label>Quantity</label>
+      <input
+        type="number"
+        value={quantity}
+        onChange={(e) => setQuantity(e.target.value)}
+      />
       {formErrors.quantity && <p className="error">{formErrors.quantity}</p>}
-    <label>Product image:</label>
-    <input type="file" accept="image/*" onChange={handleProductImageUpload} />
-      {formErrors.productImage && <p className="error">{formErrors.productImage}</p>}
+      <label>Product image:</label>
+      <input type="file" accept="image/*" onChange={handleProductImageUpload} />
+      {formErrors.productImage && (
+        <p className="error">{formErrors.productImage}</p>
+      )}
 
       <label>Is the product printable?</label>
       <input
@@ -220,19 +243,31 @@ const AddProductForm = () => {
       {isPrintable && (
         <div>
           <label>Upload Front Image:</label>
-          <input type="file" accept="image/*" onChange={handleFrontImageUpload} />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFrontImageUpload}
+          />
 
           <label>Upload Back Image:</label>
-          <input type="file" accept="image/*" onChange={handleBackImageUpload} />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleBackImageUpload}
+          />
         </div>
       )}
 
       <button onClick={handleSubmit}>Add Product</button>
-      {submissionStatus === 'success' && (
-        <p className="submission-message success">Product saved successfully!</p>
+      {submissionStatus === "success" && (
+        <p className="submission-message success">
+          Product saved successfully!
+        </p>
       )}
-      {submissionStatus === 'error' && (
-        <p className="submission-message error">Failed to save product. Please try again.</p>
+      {submissionStatus === "error" && (
+        <p className="submission-message error">
+          Failed to save product. Please try again.
+        </p>
       )}
     </div>
   );

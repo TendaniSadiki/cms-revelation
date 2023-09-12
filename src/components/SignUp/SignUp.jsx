@@ -1,24 +1,27 @@
-import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { NavLink } from 'react-router-dom';
-import { auth, db } from '../../config/firebase';
-import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
-
+import React, { useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
+import { NavLink } from "react-router-dom";
+import { auth, db } from "../../config/firebase";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import "./SignUp.css";
 const SignUp = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [businessName, setBusinessName] = useState('');
-  const [businessAddress, setBusinessAddress] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [businessName, setBusinessName] = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
   const [taxInfo, setTaxInfo] = useState({
-    taxId: '',
-    taxJurisdiction: '',
+    taxId: "",
+    taxJurisdiction: "",
   });
-  const [fullName, setFullName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [profilePicture, setProfilePicture] = useState('');
-  const [securityQuestion1, setSecurityQuestion1] = useState('');
-  const [securityQuestion2, setSecurityQuestion2] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
+  const [securityQuestion1, setSecurityQuestion1] = useState("");
+  const [securityQuestion2, setSecurityQuestion2] = useState("");
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [error, setError] = useState(null);
   const [step, setStep] = useState(0);
@@ -44,9 +47,9 @@ const SignUp = () => {
           businessName,
           businessAddress,
         };
-        const businessCollectionRef = collection(db, 'admins');
+        const businessCollectionRef = collection(db, "admins");
         await addDoc(businessCollectionRef, businessData);
-  
+
         setStep(3);
         // Redirect or perform the next step as needed
       } else if (step === 3) {
@@ -55,9 +58,9 @@ const SignUp = () => {
           taxId: taxInfo.taxId,
           taxJurisdiction: taxInfo.taxJurisdiction,
         };
-        const taxCollectionRef = collection(db, 'admins');
+        const taxCollectionRef = collection(db, "admins");
         await addDoc(taxCollectionRef, { taxInfo: taxData }, { merge: true });
-  
+
         setStep(4);
         // Redirect or perform the next step as needed
       } else if (step === 4) {
@@ -71,25 +74,28 @@ const SignUp = () => {
           securityQuestion2,
           termsAgreed,
         };
-        const userCollectionRef = collection(db, 'admins');
-  
+        const userCollectionRef = collection(db, "admins");
+
         // Get the user's UID
         const user = auth.currentUser;
         const userUid = user.uid;
-  
+
         // Use the UID as the document ID
         const userDocRef = doc(userCollectionRef, userUid);
         await setDoc(userDocRef, userData);
-  
+
         // Create a subcollection under the user's document
-        const subcollectionRef = collection(userDocRef, 'store');
-  
+        const subcollectionRef = collection(userDocRef, "store");
+
         // Use the UID as the document ID for the subcollection
-        const subcollectionDocRef = doc(subcollectionRef, 'products');
-  
+        const subcollectionDocRef = doc(subcollectionRef, "products");
+
         // Add data to the subcollection
-        await setDoc(subcollectionDocRef, { field1: 'value1', field2: 'value2' });
-  
+        await setDoc(subcollectionDocRef, {
+          field1: "value1",
+          field2: "value2",
+        });
+
         setStep(5);
         // Redirect or perform the next step as needed
       }
@@ -97,19 +103,35 @@ const SignUp = () => {
       setError(error.message);
     }
   };
-  
-
-  
 
   return (
     <div className="signup-container">
       {step === 0 && (
-        <>
+        <div className="getStaarted">
           <h2>Welcome! Let's get started.</h2>
-          <button type="button" onClick={handleGetStarted}>
-            Get Started
-          </button>
-        </>
+          <div className="leftSignUp">
+            <h2>left</h2>
+            <div className="Titles">
+              <div className="titleWrapper">
+                <div className="titleItem">Fast service</div>
+                <div className="titleItem">Secured</div>
+                <div className="titleItem">Easy to use</div>
+                <div className="titleItem">Earn more</div>
+              </div>
+            </div>
+          </div>
+          <div className="rightSignUp">
+            <div className="getStartedBtn">
+              <h2>right</h2>
+              <button type="button" onClick={handleGetStarted}>
+                Get Started
+              </button>
+            </div>
+            <p>
+            Already have an account? <NavLink to="/signin">Sign In</NavLink>
+          </p>
+          </div>
+        </div>
       )}
       {step === 1 && (
         <>
@@ -171,13 +193,17 @@ const SignUp = () => {
               type="text"
               placeholder="Tax ID or Social Security Number"
               value={taxInfo.taxId}
-              onChange={(e) => setTaxInfo({ ...taxInfo, taxId: e.target.value })}
+              onChange={(e) =>
+                setTaxInfo({ ...taxInfo, taxId: e.target.value })
+              }
             />
             <input
               type="text"
               placeholder="Taxation Jurisdiction"
               value={taxInfo.taxJurisdiction}
-              onChange={(e) => setTaxInfo({ ...taxInfo, taxJurisdiction: e.target.value })}
+              onChange={(e) =>
+                setTaxInfo({ ...taxInfo, taxJurisdiction: e.target.value })
+              }
             />
             <button type="button" onClick={() => setStep(4)}>
               Next
@@ -248,10 +274,10 @@ const SignUp = () => {
         </>
       )}
 
-      
       {step === 5 && (
         <p>
-          Verification email sent! Please check your inbox and follow the instructions to verify your email address.
+          Verification email sent! Please check your inbox and follow the
+          instructions to verify your email address.
         </p>
       )}
     </div>
