@@ -17,6 +17,7 @@ const AddProductForm = () => {
   const [frontImage, setFrontImage] = useState(null);
   const [backImage, setBackImage] = useState(null);
   const [submissionStatus, setSubmissionStatus] = useState(null);
+  const [colorImages, setColorImages] = useState({});
 
   const [formErrors, setFormErrors] = useState({});
 
@@ -33,7 +34,14 @@ const AddProductForm = () => {
       }
     });
   };
-
+  const handleColorImageUpload = (color, event) => {
+    const imageFile = event.target.files[0];
+    
+    setColorImages((prevImages) => ({
+      ...prevImages,
+      [color]: imageFile,
+    }));
+  };
   const handleColorChange = (color) => {
     // Toggle selected color
     setSelectedColors((prevColors) => {
@@ -77,12 +85,21 @@ const AddProductForm = () => {
 
   const handleSubmit = async () => {
     try {
-      // Convert images to base64 strings
-      const productImageBase64 = await convertFileToBase64(productImage);
+      // Construct the product data with base64-encoded images
       const frontImageBase64 = frontImage ? frontImage.base64 : null;
       const backImageBase64 = backImage ? backImage.base64 : null;
 
-      // Construct the product data with base64-encoded images
+      // Convert color images to base64 strings
+      const colorImageBase64 = {};
+      for (const color of selectedColors) {
+        const colorImageFile = colorImages[color];
+        if (colorImageFile) {
+          const base64 = await convertFileToBase64(colorImageFile);
+          colorImageBase64[color] = base64;
+        }
+      }
+
+      // Construct the product data
       const productData = {
         brand,
         category,
@@ -92,13 +109,13 @@ const AddProductForm = () => {
         quantity,
         availableSizes: selectedSizes,
         availableColors: selectedColors,
-        productImage: productImageBase64,
         isPrintable,
         frontImage: frontImageBase64,
         backImage: backImageBase64,
+        colorImages: colorImageBase64,
       };
 
-      // Upload base64-encoded images to Firebase Storage
+      // Upload product data to Firestore
       const user = auth.currentUser;
       if (user) {
         const userUid = user.uid;
@@ -111,26 +128,14 @@ const AddProductForm = () => {
         await addDoc(productsCollectionRef, productData);
 
         // Reset form fields and set submission status
-        setBrand("");
-        setCategory("");
-        setProductName("");
-        setPrice("");
-        setDescription("");
-        setSelectedSizes([]);
-        setSelectedColors([]);
-        setIsPrintable(false);
-        setFrontImage(null);
-        setBackImage(null);
-        setProductImage(null);
-        setFormErrors({});
-        setSubmissionStatus("success");
+        // ...
+
       }
     } catch (error) {
       console.error("Error adding product:", error);
-      setSubmissionStatus("error");
+      // ...
     }
   };
-
   // Helper function to convert File to base64
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -194,7 +199,26 @@ const AddProductForm = () => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
-
+ <label>Available Colors:</label>
+      {colors.map((color) => (
+        <div key={color}>
+          <label>
+            <input
+              type="checkbox"
+              checked={selectedColors.includes(color)}
+              onChange={() => handleColorChange(color)}
+            />
+            {color}
+          </label>
+          {selectedColors.includes(color) && (
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleColorImageUpload(color, e)}
+            />
+          )}
+        </div>
+      ))}
       <label>Available Sizes:</label>
       {sizes.map((size) => (
         <label key={size}>
