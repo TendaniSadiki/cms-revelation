@@ -16,10 +16,10 @@ const AddProductForm = () => {
   const [isPrintable, setIsPrintable] = useState(false);
   const [frontImage, setFrontImage] = useState(null);
   const [backImage, setBackImage] = useState(null);
-  const [submissionStatus, setSubmissionStatus] = useState(null);
+  const [submissionStatus] = useState(null);
   const [colorImages, setColorImages] = useState({});
-  
-  const [formErrors, setFormErrors] = useState({});
+  console.log(productImage)
+  const [formErrors] = useState({});
 
   const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
   const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"];
