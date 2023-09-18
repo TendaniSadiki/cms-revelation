@@ -18,7 +18,7 @@ const AddProductForm = () => {
   const [backImage, setBackImage] = useState(null);
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const [colorImages, setColorImages] = useState({});
-
+  
   const [formErrors, setFormErrors] = useState({});
 
   const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];

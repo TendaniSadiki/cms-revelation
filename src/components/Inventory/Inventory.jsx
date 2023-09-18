@@ -102,7 +102,6 @@ const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"];
       <h2>Inventory</h2>
       <ul>
         {products.map((product) => (
-          console.log(product.colorImages),
           <li key={product.id}>
             <img src={product.productImage} alt="product" className="InventoryImage" />
             <p>Product Name: {product.productName}</p>
