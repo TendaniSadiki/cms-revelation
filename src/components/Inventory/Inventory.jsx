@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "../../config/firebase";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import './Inventory.css';
-import { FaTrash, FaTshirt } from 'react-icons/fa'; // Import the trash icon
+import { FaTrash, FaTshirt } from 'react-icons/fa'; // Import the trash and T-shirt icons
+import Modal from "./Modal"; // Import the Modal component
 
 const Inventory = () => {
   const [products, setProducts] = useState([]);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // Fetch user's products from Firestore
@@ -41,16 +44,18 @@ const Inventory = () => {
     }
   };
 
-  const handleColorFilter = (color) => {
-    setSelectedColor(color);
+  const openModal = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
   };
 
-  const resetColorFilter = () => {
-    setSelectedColor(null);
+  const closeModal = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(false);
   };
 
   return (
-    <div>
+    <div className="Inventory"> {/* Apply the Inventory style */}
       <h2>Inventory</h2>
      
       <ul>
@@ -58,20 +63,37 @@ const Inventory = () => {
           <li key={product.id}>
             {(!selectedColor || product.availableColors.includes(selectedColor)) && (
               <div>
-                <img src={product.colorImages?.Blue} alt="product" className="InventoryImage" />
-                <img src={product.colorImages?.Red} alt="product" className="InventoryImage" />           
-                <img src={product.colorImages?.Green} alt="product" className="InventoryImage" />   
+                {product.colorImages ? (
+                  <img
+                  src={
+                    product.colorImages.Blue ||
+                    product.colorImages.Red ||
+                    product.colorImages.Green ||
+                    product.colorImages.Brown ||
+                    product.colorImages.Black ||
+                    product.colorImages.White ||
+                    product.colorImages.Yellow ||
+                    product.colorImages.Orange ||
+                    product.colorImages.Purple
+                  }                    alt="product"
+                    className="InventoryImage" // Apply the InventoryImage style
+                    onClick={() => openModal(product)}
+                  />
+                ) : (
+                  <FaTshirt size={50} onClick={() => openModal(product)} /> // Display the T-shirt icon as default
+                )}
                 <p>Product Name: {product.productName}</p>
                 <p>Price: {product.price}</p>
                 <p>Colors: {product.availableColors.join(", ")}</p>
-                <button onClick={() => handleDeleteProduct(product.id)}>
-                  <FaTrash /> Delete
-                </button>
+               
               </div>
             )}
           </li>
         ))}
       </ul>
+
+      <Modal isOpen={isModalOpen} closeModal={closeModal} product={selectedProduct} selectedColor={selectedColor}   onDeleteProduct={handleDeleteProduct} // Make sure this is correctly passed
+/>
     </div>
   );
 };

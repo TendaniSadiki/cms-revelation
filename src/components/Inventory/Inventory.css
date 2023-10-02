@@ -1,7 +1,60 @@
-.Inventory{
+/* Inventory Component Styles */
+.Inventory {
     background-color: #F7CAC9;
-}
-.InventoryImage{
+    padding: 20px;
+  }
+  
+  .InventoryImage {
     width: 100px;
     height: 100px;
-}
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  /* Custom Modal Styles */
+  .custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background overlay */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    color: #777;
+  }
+  
+  .modal-image-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .modal-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+  }
+  

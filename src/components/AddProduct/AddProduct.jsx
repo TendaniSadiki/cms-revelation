@@ -3,6 +3,68 @@ import "./AddProductForm.css";
 import { auth, db } from "../../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 
+const TextInput = ({ label, value, onChange }) => (
+  <div>
+    <label>{label}</label>
+    <input type="text" value={value} onChange={onChange} />
+  </div>
+);
+
+const NumberInput = ({ label, value, onChange }) => (
+  <div>
+    <label>{label}</label>
+    <input type="number" value={value} onChange={onChange} />
+  </div>
+);
+
+const TextArea = ({ label, value, onChange }) => (
+  <div>
+    <label>{label}</label>
+    <textarea value={value} onChange={onChange} />
+  </div>
+);
+
+const CheckboxInput = ({ label, checked, onChange }) => (
+  <label>
+    <input type="checkbox" checked={checked} onChange={onChange} />
+    {label}
+  </label>
+);
+
+const FileInput = ({ label, accept, onChange }) => (
+  <div>
+    <label>{label}</label>
+    <input type="file" accept={accept} onChange={onChange} />
+  </div>
+);
+
+const SelectInput = ({ label, value, options, onChange }) => (
+  <div>
+    <label>{label}</label>
+    <select value={value} onChange={onChange}>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
+const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+const shoeSizes = ["US 5", "US 6", "US 7", "US 8", "US 9", "US 10"];
+const colors = [
+  "Red",
+  "Blue",
+  "Green",
+  "Black",
+  "White",
+  "Yellow",
+  "Orange",
+  "Purple",
+  "Brown",
+];
+
 const AddProductForm = () => {
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("");
@@ -18,47 +80,41 @@ const AddProductForm = () => {
   const [backImage, setBackImage] = useState(null);
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const [colorImages, setColorImages] = useState({});
+  const [colorQuantities, setColorQuantities] = useState({});
+  const [totalQuantity, setTotalQuantity] = useState(0);
 
   const [formErrors, setFormErrors] = useState({});
 
-  const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
-  const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"];
-
   const handleSizeChange = (size) => {
-    // Toggle selected size
-    setSelectedSizes((prevSizes) => {
-      if (prevSizes.includes(size)) {
-        return prevSizes.filter((s) => s !== size);
-      } else {
-        return [...prevSizes, size];
-      }
-    });
+    setSelectedSizes((prevSizes) =>
+      prevSizes.includes(size)
+        ? prevSizes.filter((s) => s !== size)
+        : [...prevSizes, size]
+    );
   };
+
   const handleColorImageUpload = (color, event) => {
     const imageFile = event.target.files[0];
-
     setColorImages((prevImages) => ({
       ...prevImages,
       [color]: imageFile,
     }));
   };
+
   const handleColorChange = (color) => {
-    // Toggle selected color
-    setSelectedColors((prevColors) => {
-      if (prevColors.includes(color)) {
-        return prevColors.filter((c) => c !== color);
-      } else {
-        return [...prevColors, color];
-      }
-    });
+    setSelectedColors((prevColors) =>
+      prevColors.includes(color)
+        ? prevColors.filter((c) => c !== color)
+        : [...prevColors, color]
+    );
   };
 
   const handleProductImageUpload = (event) => {
     const imageFile = event.target.files[0];
     setProductImage(imageFile);
   };
+
   const handleFrontImageUpload = async (event) => {
-    // Handle front image upload
     const imageFile = event.target.files[0];
     if (imageFile) {
       try {
@@ -71,7 +127,6 @@ const AddProductForm = () => {
   };
 
   const handleBackImageUpload = async (event) => {
-    // Handle back image upload
     const imageFile = event.target.files[0];
     if (imageFile) {
       try {
@@ -83,12 +138,28 @@ const AddProductForm = () => {
     }
   };
 
+  const handleColorQuantityChange = (color, value) => {
+    const parsedValue = parseInt(value); // Parse the input value as an integer
+    setColorQuantities((prevQuantities) => ({
+      ...prevQuantities,
+      [color]: isNaN(parsedValue) ? 0 : parsedValue, // Set 0 if parsedValue is NaN
+    }));
+  
+    // Calculate the total quantity based on colorQuantities
+    let total = 0;
+    for (const quantity of Object.values(colorQuantities)) {
+      total += isNaN(quantity) ? 0 : quantity;
+    }
+    setTotalQuantity(total);
+  };
+  
+  
   const handleSubmit = async () => {
     try {
       // Construct the product data with base64-encoded images
       const frontImageBase64 = frontImage ? frontImage.base64 : null;
-      const backImageBase64 = backImage ? backImage.base64 : null;
-
+      const backImageBase64 = backImage ? frontImage.base64 : null;
+  
       // Convert color images to base64 strings
       const colorImageBase64 = {};
       for (const color of selectedColors) {
@@ -98,7 +169,16 @@ const AddProductForm = () => {
           colorImageBase64[color] = base64;
         }
       }
-
+  
+      // Calculate the total quantity based on colorQuantities
+      let totalQuantity = 0;
+      for (const color of selectedColors) {
+        const colorQuantity = colorQuantities[color];
+        if (!isNaN(colorQuantity)) {
+          totalQuantity += parseInt(colorQuantity);
+        }
+      }
+  
       // Construct the product data
       const productData = {
         brand,
@@ -106,7 +186,7 @@ const AddProductForm = () => {
         productName,
         price,
         description,
-        quantity,
+        quantity: totalQuantity, // Set the total quantity
         availableSizes: selectedSizes,
         availableColors: selectedColors,
         isPrintable,
@@ -114,7 +194,7 @@ const AddProductForm = () => {
         backImage: backImageBase64,
         colorImages: colorImageBase64,
       };
-
+  
       // Upload product data to Firestore
       const user = auth.currentUser;
       if (user) {
@@ -126,16 +206,32 @@ const AddProductForm = () => {
           "products"
         );
         await addDoc(productsCollectionRef, productData);
-
+  
         // Reset form fields and set submission status
-        // ...
-
+        setBrand("");
+        setCategory("");
+        setProductName("");
+        setPrice("");
+        setDescription("");
+        setQuantity("");
+        setSelectedSizes([]);
+        setSelectedColors([]);
+        setProductImage(null);
+        setIsPrintable(false);
+        setFrontImage(null);
+        setBackImage(null);
+        setColorImages({});
+        setColorQuantities({});
+        setSubmissionStatus("success");
       }
     } catch (error) {
       console.error("Error adding product:", error);
-      // ...
+      // Handle error and set submission status accordingly
+      setSubmissionStatus("error");
     }
   };
+  
+  
   // Helper function to convert File to base64
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -146,136 +242,155 @@ const AddProductForm = () => {
     });
   };
 
+  const brandOptions = [
+    { value: "0", label: "Select Type" },
+    { value: "Tops", label: "Tops" },
+    { value: "Shirts", label: "Shirts" },
+    { value: "Jackets,Sweatshirts&Blazers", label: "Jackets, Sweatshirts & Blazers" },
+    { value: "Denim", label: "Denim" },
+    { value: "Pants", label: "Pants" },
+    { value: "Shorts", label: "Shorts" },
+    { value: "Shoes", label: "Shoes" },
+    { value: "Bags&Wallets", label: "Bags & Wallets" },
+    { value: "Belts", label: "Belts" },
+    { value: "Hats&Scarves", label: "Hats & Scarves" },
+  ];
+
+  const categoryOptions = [
+    { value: "0", label: "Select Category" },
+    { value: "Summer", label: "Summer" },
+    { value: "Winter", label: "Winter" },
+    { value: "Accessories", label: "Accessories" },
+  ];
+
   return (
     <div className="form-container">
-      <div className="form-content"></div>
-      <label>Select Product Type:</label>
-      <select value={brand} onChange={(e) => setBrand(e.target.value)}>
-        <option value="0">Select Type</option>
-        <option value="Tops">Tops</option>
-        <option value="Shirts">Shirts</option>
-        <option value="Jackets,Sweatshirts&Blazers">
-          Jackets, Sweatshirts & Blazers
-        </option>
-        <option value="Denim">Denim</option>
-        <option value="Pants">Pants</option>
-        <option value="Shorts">Shorts</option>
-        <option value="Shoes">Shoes</option>
-        <option value="Bags&Wallets">Bags & Wallets</option>
-        <option value="Belts">Belts</option>
-        <option value="Hats&Scarves">Hats & Scarves</option>
-      </select>
+      <div className="form-content">
+        <SelectInput
+          label="Select Product Type:"
+          value={brand}
+          options={brandOptions}
+          onChange={(e) => {
+            setBrand(e.target.value);
+            // Clear selected sizes when changing product type
+            setSelectedSizes([]);
+          }}
+        />
+        <SelectInput
+          label="Select Brand Category:"
+          value={category}
+          options={categoryOptions}
+          onChange={(e) => setCategory(e.target.value)}
+        />
+        <TextInput
+          label="Product Name:"
+          value={productName}
+          onChange={(e) => setProductName(e.target.value)}
+        />
+        {formErrors.productName && (
+          <p className="error">{formErrors.productName}</p>
+        )}
 
-      <div>
-        <label>Select Brand Category:</label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="0">Select Category</option>
-          <option value="Summer">Summer</option>
-          <option value="Winter">Winter</option>
-          <option value="Accessories">Accessories</option>
-        </select>
+        <NumberInput
+          label="Price:"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        {formErrors.price && <p className="error">{formErrors.price}</p>}
+
+        <TextArea
+          label="About the Product:"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
       </div>
 
-      <label>Product Name:</label>
-      <input
-        type="text"
-        value={productName}
-        onChange={(e) => setProductName(e.target.value)}
-      />
-      {formErrors.productName && (
-        <p className="error">{formErrors.productName}</p>
-      )}
-
-      <label>Price:</label>
-      <input
-        type="number"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
-      />
-      {formErrors.price && <p className="error">{formErrors.price}</p>}
-
-      <label>About the Product:</label>
-      <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
       <label>Available Colors:</label>
       {colors.map((color) => (
         <div key={color}>
-          <label>
-            <input
-              type="checkbox"
-              checked={selectedColors.includes(color)}
-              onChange={() => handleColorChange(color)}
-            />
-            {color}
-          </label>
+          <CheckboxInput
+            label={color}
+            checked={selectedColors.includes(color)}
+            onChange={() => handleColorChange(color)}
+          />
           {selectedColors.includes(color) && (
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleColorImageUpload(color, e)}
-            />
+            <>
+              <NumberInput
+                label={`Quantity for ${color}:`}
+                value={colorQuantities[color] || ""}
+                onChange={(e) =>
+                  handleColorQuantityChange(color, e.target.value)
+                }
+              />
+              <FileInput
+                label={`Upload ${color} Image:`}
+                accept="image/*"
+                onChange={(e) => handleColorImageUpload(color, e)}
+              />
+            </>
           )}
         </div>
       ))}
-      <label>Available Sizes:</label>
-      {sizes.map((size) => (
-        <label key={size}>
-          <input
-            type="checkbox"
-            checked={selectedSizes.includes(size)}
-            onChange={() => handleSizeChange(size)}
-          />
-          {size}
-        </label>
-      ))}
 
-      <label>Available Colors:</label>
-      {colors.map((color) => (
-        <div key={color}>
-          <label>
-            <input
-              type="checkbox"
-              checked={selectedColors.includes(color)}
-              onChange={() => handleColorChange(color)}
-            />
-            {color}
-          </label>
+      <label>Available Sizes:</label>
+      {brand === "Shoes" ? (
+        <div>
+          {shoeSizes.map((size) => (
+            <div key={size}>
+              <CheckboxInput
+                label={size}
+                checked={selectedSizes.includes(size)}
+                onChange={() => handleSizeChange(size)}
+              />
+            </div>
+          ))}
         </div>
-      ))}
-      <label>Quantity</label>
-      <input
-        type="number"
-        value={quantity}
-        onChange={(e) => setQuantity(e.target.value)}
-      />
+      ) : (
+        <div>
+          {sizes.map((size) => (
+            <div key={size}>
+              <CheckboxInput
+                label={size}
+                checked={selectedSizes.includes(size)}
+                onChange={() => handleSizeChange(size)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+<NumberInput
+  label="Quantity"
+  value={totalQuantity}
+  onChange={(e) => setTotalQuantity(e.target.value)}
+/>
+
       {formErrors.quantity && <p className="error">{formErrors.quantity}</p>}
-      <label>Product image:</label>
-      <input type="file" accept="image/*" onChange={handleProductImageUpload} />
+
+      <FileInput
+        label="Product image:"
+        accept="image/*"
+        onChange={handleProductImageUpload}
+      />
       {formErrors.productImage && (
         <p className="error">{formErrors.productImage}</p>
       )}
 
-      <label>Is the product printable?</label>
-      <input
-        type="checkbox"
+      <CheckboxInput
+        label="Is the product printable?"
         checked={isPrintable}
         onChange={() => setIsPrintable(!isPrintable)}
       />
 
       {isPrintable && (
         <div>
-          <label>Upload Front Image:</label>
-          <input
-            type="file"
+          <FileInput
+            label="Upload Front Image:"
             accept="image/*"
             onChange={handleFrontImageUpload}
           />
-
-          <label>Upload Back Image:</label>
-          <input
-            type="file"
+          <FileInput
+            label="Upload Back Image:"
             accept="image/*"
             onChange={handleBackImageUpload}
           />
