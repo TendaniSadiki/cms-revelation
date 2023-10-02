@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AddProductForm.css";
 import { auth, db } from "../../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
@@ -63,6 +63,8 @@ const colors = [
   "Orange",
   "Purple",
   "Brown",
+  "Gold",  
+  "Silver",
 ];
 
 const AddProductForm = () => {
@@ -71,17 +73,17 @@ const AddProductForm = () => {
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [setQuantity] = useState("");
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
-  const [setProductImage] = useState(null);
   const [isPrintable, setIsPrintable] = useState(false);
   const [frontImage, setFrontImage] = useState(null);
   const [backImage, setBackImage] = useState(null);
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const [colorImages, setColorImages] = useState({});
   const [colorQuantities, setColorQuantities] = useState({});
-  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [totalQuantity, setTotalQuantity] = useState(0); // Initialize totalQuantity state
+
+
 
   const [formErrors] = useState({});
 
@@ -109,10 +111,7 @@ const AddProductForm = () => {
     );
   };
 
-  const handleProductImageUpload = (event) => {
-    const imageFile = event.target.files[0];
-    setProductImage(imageFile);
-  };
+
 
   const handleFrontImageUpload = async (event) => {
     const imageFile = event.target.files[0];
@@ -126,6 +125,7 @@ const AddProductForm = () => {
     }
   };
 
+  
   const handleBackImageUpload = async (event) => {
     const imageFile = event.target.files[0];
     if (imageFile) {
@@ -139,26 +139,22 @@ const AddProductForm = () => {
   };
 
   const handleColorQuantityChange = (color, value) => {
-    const parsedValue = parseInt(value); // Parse the input value as an integer
+    const parsedValue = parseInt(value);
     setColorQuantities((prevQuantities) => ({
       ...prevQuantities,
-      [color]: isNaN(parsedValue) ? 0 : parsedValue, // Set 0 if parsedValue is NaN
+      [color]: isNaN(parsedValue) ? 0 : parsedValue,
     }));
   
-    // Calculate the total quantity based on colorQuantities
-    let total = 0;
-    for (const quantity of Object.values(colorQuantities)) {
-      total += isNaN(quantity) ? 0 : quantity;
-    }
-    setTotalQuantity(total);
-  };
+    // Recalculate the total quantity
   
+  };
+
   
   const handleSubmit = async () => {
     try {
       // Construct the product data with base64-encoded images
       const frontImageBase64 = frontImage ? frontImage.base64 : null;
-      const backImageBase64 = backImage ? frontImage.base64 : null;
+      const backImageBase64 = backImage ? backImage.base64 : null;
   
       // Convert color images to base64 strings
       const colorImageBase64 = {};
@@ -171,12 +167,9 @@ const AddProductForm = () => {
       }
   
       // Calculate the total quantity based on colorQuantities
-      let totalQuantity = 0;
-      for (const color of selectedColors) {
-        const colorQuantity = colorQuantities[color];
-        if (!isNaN(colorQuantity)) {
-          totalQuantity += parseInt(colorQuantity);
-        }
+      let total = 0;
+      for (const color in colorQuantities) {
+        total += colorQuantities[color] || 0;
       }
   
       // Construct the product data
@@ -186,13 +179,14 @@ const AddProductForm = () => {
         productName,
         price,
         description,
-        quantity: totalQuantity, // Set the total quantity
+        quantity: total, // Assign total quantity
         availableSizes: selectedSizes,
         availableColors: selectedColors,
         isPrintable,
         frontImage: frontImageBase64,
         backImage: backImageBase64,
         colorImages: colorImageBase64,
+        colorQuantities, // Include colorQuantities in the product data
       };
   
       // Upload product data to Firestore
@@ -213,10 +207,8 @@ const AddProductForm = () => {
         setProductName("");
         setPrice("");
         setDescription("");
-        setQuantity("");
         setSelectedSizes([]);
         setSelectedColors([]);
-        setProductImage(null);
         setIsPrintable(false);
         setFrontImage(null);
         setBackImage(null);
@@ -230,6 +222,7 @@ const AddProductForm = () => {
       setSubmissionStatus("error");
     }
   };
+  
   
   
   // Helper function to convert File to base64
@@ -262,18 +255,26 @@ const AddProductForm = () => {
     { value: "Winter", label: "Winter" },
     { value: "Accessories", label: "Accessories" },
   ];
+  useEffect(() => {
+    // Calculate the total quantity based on colorQuantities
+    let total = 0;
+    for (const color in colorQuantities) {
+      total += colorQuantities[color] || 0;
+    }
 
+    // Update the totalQuantity state
+    setTotalQuantity(total);
+  }, [colorQuantities, setTotalQuantity]);
   return (
     <div className="form-container">
       <div className="form-content">
-        <SelectInput
+      <SelectInput
           label="Select Product Type:"
           value={brand}
           options={brandOptions}
           onChange={(e) => {
             setBrand(e.target.value);
-            // Clear selected sizes when changing product type
-            setSelectedSizes([]);
+            setSelectedSizes([]); // Clear selected sizes when changing product type
           }}
         />
         <SelectInput
@@ -332,50 +333,44 @@ const AddProductForm = () => {
         </div>
       ))}
 
-      <label>Available Sizes:</label>
-      {brand === "Shoes" ? (
-        <div>
-          {shoeSizes.map((size) => (
-            <div key={size}>
-              <CheckboxInput
-                label={size}
-                checked={selectedSizes.includes(size)}
-                onChange={() => handleSizeChange(size)}
-              />
+      <>
+      <p>Total Quantity: {totalQuantity}</p>
+
+      </>
+      {category !== "Accessories" && (
+        <>
+        <label>Available Sizes:</label>
+          {brand === "Shoes" ? (
+            <div>
+              {shoeSizes.map((size) => (
+                <div key={size}>
+                  <CheckboxInput
+                    label={size}
+                    checked={selectedSizes.includes(size)}
+                    onChange={() => handleSizeChange(size)}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div>
-          {sizes.map((size) => (
-            <div key={size}>
-              <CheckboxInput
-                label={size}
-                checked={selectedSizes.includes(size)}
-                onChange={() => handleSizeChange(size)}
-              />
+          ) : (
+            <div>
+              {sizes.map((size) => (
+                <div key={size}>
+                  <CheckboxInput
+                    label={size}
+                    checked={selectedSizes.includes(size)}
+                    onChange={() => handleSizeChange(size)}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+
+        </>
       )}
 
-<NumberInput
-  label="Quantity"
-  value={totalQuantity}
-  onChange={(e) => setTotalQuantity(e.target.value)}
-/>
 
-      {formErrors.quantity && <p className="error">{formErrors.quantity}</p>}
-
-      <FileInput
-        label="Product image:"
-        accept="image/*"
-        onChange={handleProductImageUpload}
-      />
-      {formErrors.productImage && (
-        <p className="error">{formErrors.productImage}</p>
-      )}
-
+      
       <CheckboxInput
         label="Is the product printable?"
         checked={isPrintable}
