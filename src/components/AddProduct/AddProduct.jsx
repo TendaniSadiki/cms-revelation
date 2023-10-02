@@ -16,10 +16,10 @@ const AddProductForm = () => {
   const [isPrintable, setIsPrintable] = useState(false);
   const [frontImage, setFrontImage] = useState(null);
   const [backImage, setBackImage] = useState(null);
-  const [submissionStatus] = useState(null);
+  const [submissionStatus, setSubmissionStatus] = useState(null);
   const [colorImages, setColorImages] = useState({});
-  console.log(productImage)
-  const [formErrors] = useState({});
+
+  const [formErrors, setFormErrors] = useState({});
 
   const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
   const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"];
@@ -36,7 +36,7 @@ const AddProductForm = () => {
   };
   const handleColorImageUpload = (color, event) => {
     const imageFile = event.target.files[0];
-    
+
     setColorImages((prevImages) => ({
       ...prevImages,
       [color]: imageFile,
@@ -199,7 +199,7 @@ const AddProductForm = () => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
- <label>Available Colors:</label>
+      <label>Available Colors:</label>
       {colors.map((color) => (
         <div key={color}>
           <label>
