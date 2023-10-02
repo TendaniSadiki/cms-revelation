@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "../../config/firebase";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import './Inventory.css';
-import { FaTrash, FaTshirt } from 'react-icons/fa'; // Import the trash and T-shirt icons
+import { FaTshirt } from 'react-icons/fa'; // Import the trash and T-shirt icons
 import Modal from "./Modal"; // Import the Modal component
 
 const Inventory = () => {
   const [products, setProducts] = useState([]);
-  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedColor] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 

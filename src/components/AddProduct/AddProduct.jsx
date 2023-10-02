@@ -71,10 +71,10 @@ const AddProductForm = () => {
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [setQuantity] = useState("");
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
-  const [productImage, setProductImage] = useState(null);
+  const [setProductImage] = useState(null);
   const [isPrintable, setIsPrintable] = useState(false);
   const [frontImage, setFrontImage] = useState(null);
   const [backImage, setBackImage] = useState(null);
@@ -83,7 +83,7 @@ const AddProductForm = () => {
   const [colorQuantities, setColorQuantities] = useState({});
   const [totalQuantity, setTotalQuantity] = useState(0);
 
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors] = useState({});
 
   const handleSizeChange = (size) => {
     setSelectedSizes((prevSizes) =>
