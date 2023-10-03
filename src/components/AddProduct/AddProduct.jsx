@@ -2,58 +2,13 @@ import React, { useState, useEffect } from "react";
 import "./AddProductForm.css";
 import { auth, db } from "../../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
+import { CheckboxInput, FileInput, NumberInput, SelectInput, TextArea, TextInput } from "../Constance/Constance";
 
-const TextInput = ({ label, value, onChange }) => (
-  <div>
-    <label>{label}</label>
-    <input type="text" value={value} onChange={onChange} />
-  </div>
-);
 
-const NumberInput = ({ label, value, onChange }) => (
-  <div>
-    <label>{label}</label>
-    <input type="number" value={value} onChange={onChange} />
-  </div>
-);
 
-const TextArea = ({ label, value, onChange }) => (
-  <div>
-    <label>{label}</label>
-    <textarea value={value} onChange={onChange} />
-  </div>
-);
-
-const CheckboxInput = ({ label, checked, onChange }) => (
-  <label>
-    <input type="checkbox" checked={checked} onChange={onChange} />
-    {label}
-  </label>
-);
-
-const FileInput = ({ label, accept, onChange }) => (
-  <div>
-    <label>{label}</label>
-    <input type="file" accept={accept} onChange={onChange} />
-  </div>
-);
-
-const SelectInput = ({ label, value, options, onChange }) => (
-  <div>
-    <label>{label}</label>
-    <select value={value} onChange={onChange}>
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  </div>
-);
-
-const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
-const shoeSizes = ["US 5", "US 6", "US 7", "US 8", "US 9", "US 10"];
-const colors = [
+export const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+export const shoeSizes = ["US 5", "US 6", "US 7", "US 8", "US 9", "US 10"];
+export const colors = [
   "Red",
   "Blue",
   "Green",
@@ -66,6 +21,7 @@ const colors = [
   "Gold",  
   "Silver",
 ];
+
 
 const AddProductForm = () => {
   const [brand, setBrand] = useState("");
