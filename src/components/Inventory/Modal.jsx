@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { FaTrash, FaEdit } from 'react-icons/fa';
 
 // Import the input components and constants from the module where they are defined
-
-import { TextInput } from "../Constance/Constance";
+import { TextInput, SelectInput, colors, sizes, shoeSizes } from "../Constance/Constance";
 
 const Modal = ({ isOpen, closeModal, product, selectedColor, onDeleteProduct, onUpdateProduct }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -46,6 +45,27 @@ const Modal = ({ isOpen, closeModal, product, selectedColor, onDeleteProduct, on
                 onChange={(e) => onUpdateProduct({ ...product, productName: e.target.value })}
               />
               {/* Add other editable fields as needed */}
+              <SelectInput
+                label="Sizes:"
+                value={product.sizes}
+                options={sizes.map((size) => ({ value: size, label: size }))}
+                onChange={(value) => onUpdateProduct({ ...product, sizes: value })}
+                isMulti={true}
+              />
+              <SelectInput
+                label="Shoe Sizes:"
+                value={product.shoeSizes}
+                options={shoeSizes.map((size) => ({ value: size, label: size }))}
+                onChange={(value) => onUpdateProduct({ ...product, shoeSizes: value })}
+                isMulti={true}
+              />
+              <SelectInput
+                label="Colors:"
+                value={product.colors}
+                options={colors.map((color) => ({ value: color, label: color }))}
+                onChange={(value) => onUpdateProduct({ ...product, colors: value })}
+                isMulti={true}
+              />
               <button onClick={handleSaveEdit}>Save</button>
               <button onClick={handleCancelEdit}>Cancel</button>
             </div>
