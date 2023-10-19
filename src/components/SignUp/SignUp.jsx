@@ -79,7 +79,6 @@ const SignUp = () => {
     }
   };
   
-  
 
 
   return (
