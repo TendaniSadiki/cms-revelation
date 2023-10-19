@@ -5,13 +5,6 @@
     border-radius: 10px;
     width: 80%;
    }
-
-   .activebtn2{
-    background:#2207cf;
-    color:#FFFFFF;
-    cursor:pointer;
-   }
-
 .Home{
     width: 96%;
     display: block;
@@ -60,7 +53,6 @@
 .rightbar{
     background-color: red;
     float: right;
-
     width: 25%;
     height: 89vh;
     border-top-right-radius: 20px;
@@ -82,7 +74,3 @@
 .products{
   width: 70%;
 }
-  
-    
-
-
