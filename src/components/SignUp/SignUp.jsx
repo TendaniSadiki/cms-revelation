@@ -137,9 +137,7 @@ const SignUp = () => {
             </button>
           </form>
 
-          <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
+          
           </div>
         </div>
       )}
@@ -163,9 +161,7 @@ const SignUp = () => {
               Next
             </button>
           </form>
-          <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
+         
         </>
       )}
       {step === 3 && (
@@ -193,9 +189,7 @@ const SignUp = () => {
               Next
             </button>
           </form>
-          <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
+          
         </>
       )}
 
@@ -253,9 +247,7 @@ const SignUp = () => {
               Sign Up
             </button>
           </form>
-          <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
+          
         </>
       )}
 
