@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { auth, db } from "./config/firebase";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AddProductForm from "./components/AddProduct/AddProduct";
+import { auth } from "./config/firebase";
+
 import Signup from "./components/SignUp/SignUp";
 import Home from "./components/Home/Home";
 import SignIn from "./components/SignIn/SignIn";
@@ -76,6 +80,7 @@ function App() {
               <>
               <Route path="/home" element={<Home />} />
               <Route path="/*" element={<Home />} />
+
               </>
             ) : (
               <>
@@ -88,6 +93,20 @@ function App() {
           
         </div>
       )}
+
+            </>
+          ) : (
+            <>
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/*" element={<Signup />} />
+            </>
+          )}
+        </Routes>
+
+        {isEmailVerified && user && <AddProductForm />}
+      </div>
+
     </Router>
   );
 }
