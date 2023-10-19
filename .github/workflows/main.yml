@@ -40,7 +40,7 @@ jobs:
           if [ "${{ github.ref }}" = "refs/heads/master" ]; then
             CHANNEL="master"
           elif [ "${{ github.ref }}" = "refs/heads/developer" ]; then
-            CHANNEL="client"
+            CHANNEL="developer"
           elif [ "${{ github.ref }}" = "refs/heads/staging" ]; then
             CHANNEL="staging"
           else
