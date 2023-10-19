@@ -61,7 +61,7 @@ function App() {
           <nav>
             <ul>
               <li>
-                <button onClick={handleLogout}>Logout</button>
+                <button onClick={handleLogout} className="btn">Logout</button>
               </li>
             </ul>
           </nav>

@@ -2,7 +2,26 @@ import React, { useState, useEffect } from "react";
 import "./AddProductForm.css";
 import { auth, db } from "../../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
-import { CheckboxInput, FileInput, NumberInput, SelectInput, TextArea, TextInput, brandOptions, categoryOptions, colors, shoeSizes, sizes } from "../Constance/Constance";
+import { CheckboxInput, FileInput, NumberInput, SelectInput, TextArea, TextInput } from "../Constance/Constance";
+
+
+
+export const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
+export const shoeSizes = ["US 5", "US 6", "US 7", "US 8", "US 9", "US 10"];
+export const colors = [
+  "Red",
+  "Blue",
+  "Green",
+  "Black",
+  "White",
+  "Yellow",
+  "Orange",
+  "Purple",
+  "Brown",
+  "Gold",  
+  "Silver",
+];
+
 
 const AddProductForm = () => {
   const [brand, setBrand] = useState("");
@@ -172,7 +191,26 @@ const AddProductForm = () => {
     });
   };
 
+  const brandOptions = [
+    { value: "0", label: "Select Type" },
+    { value: "Tops", label: "Tops" },
+    { value: "Shirts", label: "Shirts" },
+    { value: "Jackets,Sweatshirts&Blazers", label: "Jackets, Sweatshirts & Blazers" },
+    { value: "Denim", label: "Denim" },
+    { value: "Pants", label: "Pants" },
+    { value: "Shorts", label: "Shorts" },
+    { value: "Shoes", label: "Shoes" },
+    { value: "Bags&Wallets", label: "Bags & Wallets" },
+    { value: "Belts", label: "Belts" },
+    { value: "Hats&Scarves", label: "Hats & Scarves" },
+  ];
 
+  const categoryOptions = [
+    { value: "0", label: "Select Category" },
+    { value: "Summer", label: "Summer" },
+    { value: "Winter", label: "Winter" },
+    { value: "Accessories", label: "Accessories" },
+  ];
   useEffect(() => {
     // Calculate the total quantity based on colorQuantities
     let total = 0;

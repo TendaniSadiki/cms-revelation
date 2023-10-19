@@ -13,26 +13,6 @@ export const colors = [
   "Gold",  
   "Silver",
 ];
-export const brandOptions = [
-    { value: "0", label: "Select Type" },
-    { value: "Tops", label: "Tops" },
-    { value: "Shirts", label: "Shirts" },
-    { value: "Jackets,Sweatshirts&Blazers", label: "Jackets, Sweatshirts & Blazers" },
-    { value: "Denim", label: "Denim" },
-    { value: "Pants", label: "Pants" },
-    { value: "Shorts", label: "Shorts" },
-    { value: "Shoes", label: "Shoes" },
-    { value: "Bags&Wallets", label: "Bags & Wallets" },
-    { value: "Belts", label: "Belts" },
-    { value: "Hats&Scarves", label: "Hats & Scarves" },
-  ];
-  
-  export const categoryOptions = [
-    { value: "0", label: "Select Category" },
-    { value: "Summer", label: "Summer" },
-    { value: "Winter", label: "Winter" },
-    { value: "Accessories", label: "Accessories" },
-  ];
 export const NumberInput = ({ label, value, onChange }) => (
     <div>
         <label>{label}</label>

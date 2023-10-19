@@ -112,30 +112,37 @@ const SignUp = () => {
         </div>
       )}
       {step === 1 && (
-        <>
+        <div>
           <h2>Step 1: Provide Email and Password</h2>
+          <div className="signin-container">
           {error && <div className="error-message">{error}</div>}
-          <form>
+          <form className='form'>
+          <div className='formgroup'>
             <input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+            </div>
+            <div className='formgroup'>
             <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            </div>
             <button type="button" onClick={handleSignUp}>
               Next
             </button>
           </form>
+
           <p>
             Already have an account? <NavLink to="/signin">Sign In</NavLink>
           </p>
-        </>
+          </div>
+        </div>
       )}
       {step === 2 && (
         <>

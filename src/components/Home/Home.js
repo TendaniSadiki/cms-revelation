@@ -13,30 +13,34 @@ function Home() {
    }
   return (
     <div className="Home">
-      <h2>Welcome to the Home Page</h2>
+      {/* <h2>Welcome to the Home Page</h2> */}
+      <div className="content">
+    <div className="left-side">
       <nav className="sidebar">
-        <ul>
-          <li>
+       
+      <div className="SideLinks"> 
             <Link onClick={()=>toogle(0)}  className={activeBtn === 0 ? 'activebtn' : "activebtn2" } to="/inventory">Inventory</Link>
-          </li>
-          <li>
+          
+         
             <Link onClick={()=>toogle(1)}  className={activeBtn === 1 ? 'activebtn' : "activebtn2" } to="/pending-orders">Pending Orders</Link>
-          </li>
-          <li>
+          
+          
             <Link onClick={()=>toogle(2)}  className={activeBtn === 2 ? 'activebtn' : "activebtn2" } to="/order-history">Order History</Link>
-          </li>
-        </ul>
+         
+        </div>
+        
+         
       </nav>
-      <div  >
+      <div className="products">
        
         {
                 ( activeBtn === 0 ? <div><Inventory /></div> : activeBtn === 1 ? <PendingOrders /> : <OrderHistory /> )
-            }
-       
-           
-      </div>
+        }
+        </div>
+       </div>
       <div className="rightbar">
         <AddProductForm/>
+      </div>
       </div>
     </div>
   );
