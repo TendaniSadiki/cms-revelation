@@ -85,7 +85,7 @@ function App() {
               </>
             )}
           </Routes>
-          /learn react/i
+          
         </div>
       )}
     </Router>
