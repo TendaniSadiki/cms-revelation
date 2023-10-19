@@ -11,7 +11,7 @@ import Loader from "./components/Loader/Loader";
 function App() {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Track loading state
+  const [isLoading, setIsLoading] = useState(true); 
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
@@ -37,7 +37,7 @@ function App() {
         setIsAdmin(false);
       }
       
-      setIsLoading(false); // Mark loading as completed
+      setIsLoading(false); 
     });
   
     return () => unsubscribe();
@@ -57,7 +57,7 @@ function App() {
 
   return (
     <Router>
-      {isLoading ? ( // Check if loading is in progress
+      {isLoading ? ( 
         <Loader />
       ) : (
         <div className="App">
