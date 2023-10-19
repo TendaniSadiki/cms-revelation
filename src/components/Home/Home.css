@@ -2,29 +2,87 @@
     background:#7A6EC6;
     color:#FFFFFF;
     cursor:pointer;
+    border-radius: 10px;
+    width: 80%;
    }
-<<<<<<< HEAD
+
    .activebtn2{
     background:#2207cf;
     color:#FFFFFF;
     cursor:pointer;
    }
-=======
+
 .Home{
-    width: 100%;
+    width: 96%;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    margin-top: 20px;
 }
   .sidebar{
     float: left;
-    width: 30%;
-    height: 100vh;
+    width: 35%;
+    height: 91vh;
+    background-color: #F7CAC9;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-right:3px black solid ;
+    border-top: 3px black solid;
+    border-bottom: 3px black solid;
+    margin: auto;
+   
   }
+ .SideLinks{
+  width: 80%;
+  height: auto;
+    /* background-color: red; */
+    display: block;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    margin-top: 50px;
+    list-style: none;
+    padding: 10px;
+  }
+ .SideLinks a{
+  list-style: none;
+  display: block;
+  font-size: 32px;
+  padding: 10px;
+  color: white;
+ }
+
   .centerCms{
-   width: 40%;
+  width: 40%;
+   text-align: center;
   }
 .rightbar{
+    background-color: red;
     float: right;
-    width: 30%;
-    height: 100vh;
-    
+
+    width: 25%;
+    height: 89vh;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+   
 }
->>>>>>> 022a5cdb11cdcd84c848c022bec95327c42c145e
+.content{
+  width: 100%;
+  display:flex;
+  margin: auto;
+  margin-top: 35px;
+}
+.left-side{
+  width: 75%;
+  display:flex;
+  height: 91vh;
+  /* background-color: blue; */
+}
+.products{
+  width: 70%;
+}
+  
+    
+
+

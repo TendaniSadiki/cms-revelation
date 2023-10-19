@@ -4,10 +4,31 @@
   padding: 20px;
   border: 1px solid #ccc;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #f7f7f7;
-  margin-top: -511px;
+  background-color: #F7CAC9;
+  height: 85.8vh;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+ 
+    border-top: 2px black solid;
+    border-bottom: 2px black solid;
 }
-
+::-webkit-scrollbar{
+  width: 2px;
+  
+}
+::-webkit-scrollbar-track{
+  background-color: white;
+  border-radius: 5px;
+  
+}
+::-webkit-scrollbar-thumb{
+  background-color: black;
+  border-radius: 5px;
+  height: 10%;
+}
 .form-section {
   margin-bottom: 20px;
 }

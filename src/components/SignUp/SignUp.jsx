@@ -1,12 +1,14 @@
+// SignUp.jsx
 import React, { useState } from "react";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
-import { NavLink } from "react-router-dom";
 import { auth, db } from "../../config/firebase";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, setDoc } from "firebase/firestore";
 import "./SignUp.css";
+import Steps from "./steps";
+
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,36 +37,25 @@ const SignUp = () => {
       if (step === 0) {
         handleGetStarted();
       } else if (step === 1) {
+        // Create user account with email and password
         await createUserWithEmailAndPassword(auth, email, password);
-        setStep(2);
+
         // Send email verification
-        sendEmailVerification(auth.currentUser).then(() => {
-          // Verification email sent
-        });
-      } else if (step === 2) {
-        // Save business info to the "admins" collection in Firestore
+        sendEmailVerification(auth.currentUser);
+
+        setStep(4); // Skip steps 2 and 3
+      } else if (step === 4) {
         const businessData = {
           businessName,
           businessAddress,
+          role: "admin",
         };
-        const businessCollectionRef = collection(db, "admins");
-        await addDoc(businessCollectionRef, businessData);
 
-        setStep(3);
-        // Redirect or perform the next step as needed
-      } else if (step === 3) {
-        // Save tax information to the "admins" collection in Firestore
         const taxData = {
           taxId: taxInfo.taxId,
           taxJurisdiction: taxInfo.taxJurisdiction,
         };
-        const taxCollectionRef = collection(db, "admins");
-        await addDoc(taxCollectionRef, { taxInfo: taxData }, { merge: true });
 
-        setStep(4);
-        // Redirect or perform the next step as needed
-      } else if (step === 4) {
-        // Save additional user information to the "admins" collection in Firestore
         const userData = {
           fullName,
           phoneNumber,
@@ -73,31 +64,17 @@ const SignUp = () => {
           securityQuestion1,
           securityQuestion2,
           termsAgreed,
+          role: "admin",
+          taxInfo: taxData, // Save tax information
+          businessInfo: businessData, // Save business information
         };
+
         const userCollectionRef = collection(db, "admins");
-
-        // Get the user's UID
-        const user = auth.currentUser;
-        const userUid = user.uid;
-
-        // Use the UID as the document ID
+        const userUid = auth.currentUser.uid;
         const userDocRef = doc(userCollectionRef, userUid);
         await setDoc(userDocRef, userData);
 
-        // Create a subcollection under the user's document
-        const subcollectionRef = collection(userDocRef, "store");
-
-        // Use the UID as the document ID for the subcollection
-        const subcollectionDocRef = doc(subcollectionRef, "products");
-
-        // Add data to the subcollection
-        await setDoc(subcollectionDocRef, {
-          field1: "value1",
-          field2: "value2",
-        });
-
         setStep(5);
-        // Redirect or perform the next step as needed
       }
     } catch (error) {
       setError(error.message);
@@ -106,180 +83,36 @@ const SignUp = () => {
 
   return (
     <div className="signup-container">
-      {step === 0 && (
-        <div className="getStaarted">
-          <h2>Welcome! Let's get started.</h2>
-          <div className="leftSignUp">
-            <h2>left</h2>
-            <div className="Titles">
-              <div className="titleWrapper">
-                <div className="titleItem">Fast service</div>
-                <div className="titleItem">Secured</div>
-                <div className="titleItem">Easy to use</div>
-                <div className="titleItem">Earn more</div>
-              </div>
-            </div>
-          </div>
-          <div className="rightSignUp">
-            <div className="getStartedBtn">
-              <h2>right</h2>
-              <button type="button" onClick={handleGetStarted}>
-                Get Started
-              </button>
-            </div>
-            <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
-          </div>
-        </div>
-      )}
-      {step === 1 && (
-        <>
-          <h2>Step 1: Provide Email and Password</h2>
-          {error && <div className="error-message">{error}</div>}
-          <form>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button type="button" onClick={handleSignUp}>
-              Next
-            </button>
-          </form>
-          <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
-        </>
-      )}
-      {step === 2 && (
-        <>
-          <h2>Step 2: Provide Business Information</h2>
-          <form>
-            <input
-              type="text"
-              placeholder="Business Name"
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Business Address"
-              value={businessAddress}
-              onChange={(e) => setBusinessAddress(e.target.value)}
-            />
-            <button type="button" onClick={() => setStep(3)}>
-              Next
-            </button>
-          </form>
-          <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
-        </>
-      )}
-      {step === 3 && (
-        <>
-          <h2>Step 3: Provide Tax Information</h2>
-          {error && <div className="error-message">{error}</div>}
-          <form>
-            <input
-              type="text"
-              placeholder="Tax ID or Social Security Number"
-              value={taxInfo.taxId}
-              onChange={(e) =>
-                setTaxInfo({ ...taxInfo, taxId: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Taxation Jurisdiction"
-              value={taxInfo.taxJurisdiction}
-              onChange={(e) =>
-                setTaxInfo({ ...taxInfo, taxJurisdiction: e.target.value })
-              }
-            />
-            <button type="button" onClick={() => setStep(4)}>
-              Next
-            </button>
-          </form>
-          <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
-        </>
-      )}
-
-      {step === 4 && (
-        <>
-          <h2>Step 4: Additional Information</h2>
-          {error && <div className="error-message">{error}</div>}
-          <form>
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Phone Number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Date of Birth"
-              value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Profile Picture URL"
-              value={profilePicture}
-              onChange={(e) => setProfilePicture(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Security Question 1"
-              value={securityQuestion1}
-              onChange={(e) => setSecurityQuestion1(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Security Question 2"
-              value={securityQuestion2}
-              onChange={(e) => setSecurityQuestion2(e.target.value)}
-            />
-            <label>
-              <input
-                type="checkbox"
-                checked={termsAgreed}
-                onChange={() => setTermsAgreed(!termsAgreed)}
-              />
-              I agree to the terms and conditions
-            </label>
-            <button type="button" onClick={handleSignUp}>
-              Sign Up
-            </button>
-          </form>
-          <p>
-            Already have an account? <NavLink to="/signin">Sign In</NavLink>
-          </p>
-        </>
-      )}
-
-      {step === 5 && (
-        <p>
-          Verification email sent! Please check your inbox and follow the
-          instructions to verify your email address.
-        </p>
-      )}
+      <Steps
+        step={step}
+        handleGetStarted={handleGetStarted}
+        email={email}
+        password={password}
+        setEmail={setEmail}
+        setPassword={setPassword}
+        businessName={businessName}
+        setBusinessName={setBusinessName}
+        businessAddress={businessAddress}
+        setBusinessAddress={setBusinessAddress}
+        taxInfo={taxInfo}
+        setTaxInfo={setTaxInfo}
+        fullName={fullName}
+        phoneNumber={phoneNumber}
+        dateOfBirth={dateOfBirth}
+        profilePicture={profilePicture}
+        securityQuestion1={securityQuestion1}
+        securityQuestion2={securityQuestion2}
+        termsAgreed={termsAgreed}
+        setFullName={setFullName}
+        setPhoneNumber={setPhoneNumber}
+        setDateOfBirth={setDateOfBirth}
+        setProfilePicture={setProfilePicture}
+        setSecurityQuestion1={setSecurityQuestion1}
+        setSecurityQuestion2={setSecurityQuestion2}
+        setTermsAgreed={setTermsAgreed}
+        handleSignUp={handleSignUp}
+        error={error}
+      />
     </div>
   );
 };

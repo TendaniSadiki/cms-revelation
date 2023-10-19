@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../../config/firebase";
-import { collection, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
-import './Inventory.css'
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import './Inventory.css';
+import { FaTshirt } from 'react-icons/fa'; // Import the trash and T-shirt icons
+import Modal from "./Modal"; // Import the Modal component
+
 const Inventory = () => {
   const [products, setProducts] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedProduct, setEditedProduct] = useState(null);
+  const [selectedColor] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // Fetch user's products from Firestore
@@ -15,12 +19,16 @@ const Inventory = () => {
       const productsCollectionRef = collection(db, "admins", userUid, "products");
 
       const fetchProducts = async () => {
-        const querySnapshot = await getDocs(productsCollectionRef);
-        const productsData = [];
-        querySnapshot.forEach((doc) => {
-          productsData.push({ id: doc.id, ...doc.data() });
-        });
-        setProducts(productsData);
+        try {
+          const querySnapshot = await getDocs(productsCollectionRef);
+          const productsData = [];
+          querySnapshot.forEach((doc) => {
+            productsData.push({ id: doc.id, ...doc.data() });
+          });
+          setProducts(productsData);
+        } catch (error) {
+          console.error("Error fetching products:", error);
+        }
       };
 
       fetchProducts();
@@ -36,60 +44,56 @@ const Inventory = () => {
     }
   };
 
-  const handleEditProduct = (product) => {
-    setIsEditing(true);
-    setEditedProduct(product);
+  const openModal = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
   };
 
-  const handleUpdateProduct = async () => {
-    if (editedProduct) {
-      try {
-        // Update product in the database
-        await updateDoc(doc(db, `admins/${auth.currentUser.uid}/products`, editedProduct.id), editedProduct);
-
-        // Update the product in the local state
-        setProducts((prevProducts) => prevProducts.map((product) => product.id === editedProduct.id ? editedProduct : product));
-
-        setIsEditing(false);
-        setEditedProduct(null);
-      } catch (error) {
-        console.error("Error updating product:", error);
-      }
-    }
+  const closeModal = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(false);
   };
 
   return (
-    <div>
+    <div className="Inventory"> {/* Apply the Inventory style */}
       <h2>Inventory</h2>
-      <ul>
+     
+       <ul>
         {products.map((product) => (
           <li key={product.id}>
-            <img src={product.productImage} alt="product" className="InventoryImage" />
-            <p>Product Name: {product.productName}</p>
-            <p>Price: {product.price}</p>
-            <button onClick={() => handleDeleteProduct(product.id)}>Delete</button>
-            <button onClick={() => handleEditProduct(product)}>Edit</button>
+            {(!selectedColor || product.availableColors.includes(selectedColor)) && (
+              <div className="productcard">
+                {product.colorImages ? (
+                  <img
+                  src={
+                    product.colorImages.Blue ||
+                    product.colorImages.Red ||
+                    product.colorImages.Green ||
+                    product.colorImages.Brown ||
+                    product.colorImages.Black ||
+                    product.colorImages.White ||
+                    product.colorImages.Yellow ||
+                    product.colorImages.Orange ||
+                    product.colorImages.Purple
+                  }                    alt="product"
+                    className="InventoryImage" // Apply the InventoryImage style
+                    onClick={() => openModal(product)}
+                  />
+                ) : (
+                  <FaTshirt size={50} onClick={() => openModal(product)} /> // Display the T-shirt icon as default
+                )}
+                <p>Product Name: {product.productName}</p>
+                <p>Price: {product.price}</p>
+                <p>Colors: {product.availableColors.join(", ")}</p>
+               
+              </div>
+            )}
           </li>
         ))}
       </ul>
 
-      {isEditing && editedProduct && (
-        <div>
-          <h3>Edit Product</h3>
-          <input
-            type="text"
-            value={editedProduct.productName}
-            onChange={(e) => setEditedProduct({ ...editedProduct, productName: e.target.value })}
-          />
-          <input
-            type="number"
-            value={editedProduct.price}
-            onChange={(e) => setEditedProduct({ ...editedProduct, price: e.target.value })}
-          />
-          <button onClick={handleUpdateProduct}>Save</button>
-          <button onClick={() => setIsEditing(false)}>Cancel</button>
-        </div>
-      )}
+      <Modal isOpen={isModalOpen} closeModal={closeModal} product={selectedProduct} selectedColor={selectedColor}   onDeleteProduct={handleDeleteProduct} // Make sure this is correctly passed
+/>
     </div>
   );
 };
