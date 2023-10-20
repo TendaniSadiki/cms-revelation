@@ -19,7 +19,7 @@ function App() {
         setUser(authUser);
   
         const userDocRef = doc(collection(db, "admins"), authUser.uid);
-  
+    
         try {
           const userDocSnapshot = await getDoc(userDocRef);
   
